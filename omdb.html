@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <style>
+            #review{
+               font-family: "Arial"; 
+            }
+            
+            input[type="text"]{
+                background-image: url('download.jpe');
+                background-repeat: no-repeat;
+                background-position: 5px 5px;
+                height: 20px;
+                width: 400px;
+                padding: 5px;
+                padding-left: 30px;
+                font-size: 20px;
+                margin-right: 20px;
+            }
+            
+            .btn{
+                height: 30px;
+                padding: 5px;
+                font-size: 15px;
+            }
+            
+            #to_compare{
+                position: absolute;
+                left: 1000px;
+                top: 10px;
+            }
+            
+            #error{
+                font-size: 20px;
+                color: red;
+            }
+            
+            #poster_div{
+                position: absolute;
+                left: 700px;
+                background-color: lightgrey;
+                border: 2px solid lightblue;
+            }
+            
+            #poster{
+                width: 300px;
+                height: 400px;
+            }
+            
+            #review{
+                width: 600px;
+            }
+        </style>
+    </head>
+    <body>
+
+        <div id="to_compare">
+            <a href="omdb_compare.html"><button class="btn">Compare Movies</button></a>
+        </div>
+
+        <div>
+            <input type="text" id="movie_title" value="" placeholder="Search..."/>
+            <button onclick="getMovie()" class="btn">Get movie details</button><br><br>
+            <span id="error"></span>
+        </div><br>
+
+        <div id="poster_div"></div>
+
+        <div id="review"></div>
+
+        <script>
+            function getMovie()
+            {
+                var xhttp = new XMLHttpRequest();
+                var review = document.getElementById("review");
+                var poster = document.getElementById("poster_div");
+                var title = document.getElementById("movie_title").value;
+                var error_span = document.getElementById("error_span");
+
+                xhttp.onreadystatechange = function ()
+                {
+                    if (xhttp.readyState == 4 && xhttp.status == 200)
+                    {
+                        var movie_data = JSON.parse(xhttp.responseText);
+
+                        if (movie_data["Title"] == undefined)
+                        {
+                            error_span.innerHTML = "Movie not in database";
+                        }
+                        else
+                        {
+                            error_span.innerHTML = "";
+
+                            poster.innerHTML = "<img src=" + movie_data["Poster"] + " id='poster'/>";
+
+                            review.innerHTML = "<b>Title</b>" + " : " + movie_data["Title"] + "<br><br>";
+
+                            for (key in movie_data)
+                            {
+                                if (!(key == "Metascore" || key == "imdbID" || key == "Response" || key == "Poster" || key == "Title"))
+                                {
+                                    review.innerHTML += "<b>" + key + "</b>" + " : " + movie_data[key] + "<br><br>";
+                                }
+                            }
+                        }
+                    }
+                };
+
+                xhttp.open("GET", "http://www.omdbapi.com/?t=" + title + "&r=json", true);
+                xhttp.send();
+            }
+        </script>
+    </body>
+</html>
